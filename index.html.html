@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Lacyidddd</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Text:ital@0;1&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --navy: #0a1628;
+    --deep: #0d2044;
+    --ocean: #1a4a7a;
+    --wave: #2a6fa8;
+    --foam: #7ab8d4;
+    --gold: #c9a84c;
+    --gold-light: #f0d080;
+    --cream: #f5edd6;
+    --parchment: #e8d9b5;
+    --rope: #8b6914;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--cream);
+    font-family: 'Crimson Text', serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  #loadingScreen {
+    position: fixed; inset: 0;
+    background: var(--navy);
+    z-index: 99999;
+    display: flex; align-items: center; justify-content: center;
+    flex-direction: column; gap: 16px;
+    transition: opacity 0.5s ease;
+  }
+  #loadingScreen.hidden { opacity: 0; pointer-events: none; }
+  .loading-text {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    color: var(--gold); font-size: 1rem; letter-spacing: 0.2em;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:0.4} 50%{opacity:1} }
+
+  .cursor {
+    position: fixed; width: 20px; height: 20px;
+    border: 2px solid var(--gold); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+    transition: transform 0.1s ease, width 0.2s, height 0.2s;
+    mix-blend-mode: screen;
+  }
+  .cursor-dot {
+    position: fixed; width: 6px; height: 6px;
+    background: var(--gold-light); border-radius: 50%;
+    pointer-events: none; z-index: 9999;
+    transform: translate(-50%,-50%);
+  }
+
+  .stars-layer { position: fixed; top:0; left:0; width:100%; height:100%; pointer-events:none; z-index:0; }
+  .star {
+    position: absolute; background: white; border-radius: 50%;
+    animation: twinkle var(--dur,3s) ease-in-out infinite;
+    animation-delay: var(--delay,0s);
+  }
+  @keyframes twinkle { 0%,100%{opacity:0.2;transform:scale(1)} 50%{opacity:1;transform:scale(1.4)} }
+
+  .moon {
+    position: fixed; top:60px; right:80px; width:90px; height:90px;
+    background: radial-gradient(circle at 35% 35%,#fff8dc,#f0d060,#c9a020);
+    border-radius: 50%; z-index:1;
+    box-shadow: 0 0 40px 15px rgba(201,168,76,0.3),0 0 80px 30px rgba(201,168,76,0.1);
+    animation: moonGlow 4s ease-in-out infinite;
+  }
+  @keyframes moonGlow {
+    0%,100%{box-shadow:0 0 40px 15px rgba(201,168,76,0.3),0 0 80px 30px rgba(201,168,76,0.1)}
+    50%{box-shadow:0 0 60px 25px rgba(201,168,76,0.5),0 0 120px 50px rgba(201,168,76,0.2)}
+  }
+
+  .hero {
+    position: relative; min-height:100vh;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    overflow:hidden; z-index:2;
+  }
+  .ocean-container { position:absolute; bottom:0; left:0; width:100%; height:45%; z-index:3; }
+  .wave-svg { position:absolute; bottom:0; width:200%; animation:waveMove var(--speed,8s) linear infinite; }
+  .wave-svg:nth-child(2) { animation-direction:reverse; opacity:0.6; bottom:10px; }
+  .wave-svg:nth-child(3) { animation-duration:12s; opacity:0.4; bottom:20px; }
+  @keyframes waveMove { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+
+  .ship-container {
+    position:absolute; bottom:38%; left:50%; transform:translateX(-50%);
+    z-index:10; animation:shipBob 3s ease-in-out infinite;
+    filter:drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+  }
+  @keyframes shipBob {
+    0%,100%{transform:translateX(-50%) translateY(0) rotate(-1deg)}
+    50%{transform:translateX(-50%) translateY(-12px) rotate(1.5deg)}
+  }
+
+  .hero-content { position:relative; z-index:20; text-align:center; padding:0 20px; margin-bottom:220px; }
+  .hero-subtitle {
+    font-family:'IM Fell English',serif; font-style:italic;
+    font-size:clamp(0.9rem,2vw,1.1rem); color:var(--foam);
+    letter-spacing:0.3em; text-transform:uppercase; margin-bottom:16px;
+    opacity:0; animation:fadeUp 1s ease forwards 0.5s;
+  }
+  .hero-title {
+    font-family:'Playfair Display',serif; font-size:clamp(2.8rem,8vw,6rem);
+    line-height:1.1; color:var(--gold-light);
+    text-shadow:0 0 60px rgba(201,168,76,0.4);
+    opacity:0; animation:fadeUp 1s ease forwards 0.8s;
+  }
+  .hero-title em { font-style:italic; color:var(--cream); display:block; font-size:0.75em; }
+  .divider-rope {
+    width:200px; height:2px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);
+    margin:20px auto; opacity:0; animation:fadeUp 1s ease forwards 1.4s;
+  }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(30px)} to{opacity:1;transform:translateY(0)} }
+
+  .scroll-cue {
+    position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+    z-index:20; text-align:center;
+    animation:fadeUp 1s ease forwards 2s, scrollBounce 2s ease-in-out infinite 3s;
+    opacity:0;
+  }
+  .scroll-cue span {
+    font-family:'IM Fell English',serif; font-style:italic;
+    font-size:0.85rem; color:var(--foam); letter-spacing:0.2em;
+    display:block; margin-bottom:8px;
+  }
+  @keyframes scrollBounce {
+    0%,100%{transform:translateX(-50%) translateY(0)}
+    50%{transform:translateX(-50%) translateY(8px)}
+  }
+
+  section { position:relative; z-index:5; padding:80px 20px; }
+  .section-inner { max-width:900px; margin:0 auto; }
+  .section-label {
+    font-family:'IM Fell English',serif; font-style:italic;
+    font-size:0.85rem; letter-spacing:0.4em; text-transform:uppercase;
+    color:var(--gold); text-align:center; margin-bottom:12px;
+  }
+  .section-title {
+    font-family:'Playfair Display',serif; font-size:clamp(1.8rem,5vw,3rem);
+    text-align:center; color:var(--cream); margin-bottom:40px; line-height:1.2;
+  }
+
+  .letter-parchment {
+    background:var(--parchment); color:#2c1a00; border-radius:4px;
+    padding:50px; position:relative;
+    box-shadow:inset 0 0 60px rgba(139,105,20,0.2),0 20px 60px rgba(0,0,0,0.5);
+    border:1px solid var(--rope);
+  }
+  .letter-parchment::before {
+    content:''; position:absolute; inset:8px;
+    border:1px solid rgba(139,105,20,0.3); border-radius:2px; pointer-events:none;
+  }
+  .letter-body {
+    font-family:'Playfair Display',serif; font-size:clamp(1rem,2.5vw,1.25rem);
+    line-height:2; font-style:italic;
+  }
+  .letter-sig {
+    margin-top:30px; text-align:right;
+    font-family:'Playfair Display',serif; font-size:1.4rem;
+    font-style:italic; color:var(--rope);
+  }
+  .stamp {
+    position:absolute; top:30px; right:30px;
+    width:70px; height:70px; border:3px solid var(--ocean); border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--ocean); font-family:'IM Fell English',serif;
+    font-size:0.55rem; letter-spacing:0.1em; text-align:center;
+    text-transform:uppercase; transform:rotate(-15deg); padding:6px; opacity:0.7;
+  }
+
+  .memories-section { background:linear-gradient(180deg,var(--navy) 0%,var(--deep) 100%); }
+  .upload-zone {
+    border:2px dashed var(--wave); border-radius:8px; padding:50px 30px;
+    text-align:center; cursor:pointer; transition:all 0.3s ease;
+    background:rgba(26,74,122,0.1); position:relative; overflow:hidden;
+  }
+  .upload-zone:hover,.upload-zone.drag-over {
+    border-color:var(--gold); background:rgba(201,168,76,0.08); transform:scale(1.01);
+  }
+  .upload-zone input { display:none; }
+  .upload-icon { width:60px; height:60px; margin:0 auto 16px; opacity:0.7; }
+  .upload-text-main { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--cream); margin-bottom:8px; }
+  .upload-text-sub { font-size:0.95rem; color:var(--foam); font-style:italic; }
+  .upload-btn {
+    margin-top:20px; display:inline-block; padding:12px 30px;
+    background:linear-gradient(135deg,var(--ocean),var(--wave));
+    color:var(--cream); border:1px solid var(--foam); border-radius:2px;
+    font-family:'IM Fell English',serif; font-style:italic;
+    font-size:1rem; letter-spacing:0.1em; cursor:pointer; transition:all 0.3s;
+  }
+  .upload-btn:hover { background:linear-gradient(135deg,var(--gold),var(--rope)); border-color:var(--gold-light); color:var(--navy); }
+
+  .gallery-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; margin-top:40px; }
+  .gallery-item {
+    position:relative; aspect-ratio:1; overflow:hidden;
+    border-radius:4px; border:1px solid rgba(201,168,76,0.2);
+    cursor:pointer; animation:fadeIn 0.5s ease; background:var(--deep);
+  }
+  @keyframes fadeIn { from{opacity:0;transform:scale(0.9)} to{opacity:1;transform:scale(1)} }
+  .gallery-item img,.gallery-item video { width:100%; height:100%; object-fit:cover; display:block; transition:transform 0.4s ease; }
+  .gallery-item:hover img,.gallery-item:hover video { transform:scale(1.07); }
+  .gallery-overlay {
+    position:absolute; inset:0;
+    background:linear-gradient(to top,rgba(0,0,0,0.7) 0%,transparent 50%);
+    opacity:0; transition:opacity 0.3s; display:flex; align-items:flex-end; padding:12px;
+  }
+  .gallery-item:hover .gallery-overlay { opacity:1; }
+  .gallery-caption { font-family:'Crimson Text',serif; font-style:italic; font-size:0.9rem; color:var(--cream); line-height:1.3; }
+  .gallery-delete {
+    position:absolute; top:8px; right:8px; width:28px; height:28px;
+    background:rgba(180,30,30,0.85); border:none; border-radius:50%;
+    color:white; font-size:1rem; cursor:pointer; display:none;
+    align-items:center; justify-content:center; z-index:10; line-height:1;
+  }
+  .gallery-item:hover .gallery-delete { display:flex; }
+  .gallery-video-badge {
+    position:absolute; top:8px; left:8px; background:rgba(10,22,40,0.8);
+    border:1px solid var(--gold); border-radius:2px; padding:2px 8px;
+    font-size:0.7rem; font-family:'IM Fell English',serif;
+    letter-spacing:0.1em; color:var(--gold-light); text-transform:uppercase;
+  }
+
+  .lightbox {
+    position:fixed; inset:0; background:rgba(5,10,20,0.96);
+    z-index:1000; display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .lightbox.active { display:flex; }
+  .lightbox-inner { position:relative; max-width:90vw; max-height:90vh; text-align:center; }
+  .lightbox-inner img,.lightbox-inner video { max-width:100%; max-height:80vh; border:1px solid var(--gold); box-shadow:0 0 60px rgba(201,168,76,0.2); }
+  .lightbox-caption { margin-top:16px; font-family:'Playfair Display',serif; font-style:italic; font-size:1.1rem; color:var(--parchment); }
+  .lightbox-close { position:absolute; top:-40px; right:0; background:none; border:none; color:var(--gold); font-size:2rem; cursor:pointer; }
+  .lightbox-nav {
+    position:absolute; top:50%; transform:translateY(-50%);
+    background:rgba(201,168,76,0.15); border:1px solid var(--gold);
+    color:var(--gold-light); width:40px; height:60px; font-size:1.3rem;
+    cursor:pointer; border-radius:2px; transition:background 0.2s;
+  }
+  .lightbox-nav:hover { background:rgba(201,168,76,0.35); }
+  .lightbox-prev { left:-55px; }
+  .lightbox-next { right:-55px; }
+
+  .caption-modal {
+    position:fixed; inset:0; background:rgba(5,10,20,0.9);
+    z-index:2000; display:none; align-items:center; justify-content:center; padding:20px;
+  }
+  .caption-modal.active { display:flex; }
+  .caption-box {
+    background:var(--deep); border:1px solid var(--gold); border-radius:4px;
+    padding:40px; max-width:500px; width:100%; box-shadow:0 0 80px rgba(201,168,76,0.2);
+  }
+  .caption-box h3 { font-family:'Playfair Display',serif; font-size:1.5rem; color:var(--gold-light); margin-bottom:20px; text-align:center; }
+  .caption-box textarea {
+    width:100%; background:rgba(10,22,40,0.8); border:1px solid var(--wave);
+    color:var(--cream); padding:14px; font-family:'Crimson Text',serif;
+    font-size:1rem; font-style:italic; border-radius:2px; resize:vertical;
+    min-height:100px; outline:none; transition:border-color 0.2s;
+  }
+  .caption-box textarea:focus { border-color:var(--gold); }
+  .caption-box textarea::placeholder { color:var(--foam); }
+  .caption-box-btns { display:flex; gap:12px; margin-top:16px; justify-content:flex-end; }
+  .btn-skip,.btn-save {
+    padding:10px 24px; border-radius:2px; font-family:'IM Fell English',serif;
+    font-style:italic; font-size:1rem; cursor:pointer; border:1px solid; transition:all 0.2s;
+  }
+  .btn-skip { background:transparent; border-color:var(--wave); color:var(--foam); }
+  .btn-skip:hover { border-color:var(--foam); color:var(--cream); }
+  .btn-save { background:linear-gradient(135deg,var(--gold),var(--rope)); border-color:var(--gold-light); color:var(--navy); font-weight:bold; }
+  .btn-save:hover { opacity:0.85; }
+
+  .countdown-section { background:linear-gradient(180deg,var(--deep) 0%,#071020 100%); text-align:center; }
+  .countdown-grid { display:flex; justify-content:center; gap:20px; flex-wrap:wrap; margin-top:40px; }
+  .countdown-box {
+    background:rgba(26,74,122,0.3); border:1px solid var(--gold);
+    border-radius:4px; padding:24px 28px; min-width:100px; position:relative;
+  }
+  .countdown-box::before { content:''; position:absolute; inset:3px; border:1px solid rgba(201,168,76,0.15); border-radius:2px; }
+  .countdown-num { font-family:'Playfair Display',serif; font-size:3rem; color:var(--gold-light); line-height:1; display:block; }
+  .countdown-label { font-family:'IM Fell English',serif; font-style:italic; font-size:0.85rem; color:var(--foam); letter-spacing:0.15em; text-transform:uppercase; display:block; margin-top:8px; }
+
+  .compass { width:120px; height:120px; margin:0 auto 40px; animation:compassSpin 20s linear infinite; }
+  @keyframes compassSpin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+
+  footer { background:#050d1a; padding:60px 20px; text-align:center; position:relative; z-index:5; border-top:1px solid rgba(201,168,76,0.2); }
+  footer p { font-family:'IM Fell English',serif; font-style:italic; color:var(--foam); font-size:1.1rem; line-height:2; }
+  .footer-anchor { width:50px; margin:0 auto 20px; opacity:0.5; }
+  .horizon { width:100%; height:2px; background:linear-gradient(90deg,transparent,var(--gold),transparent); margin:0 auto; max-width:600px; }
+
+  .gallery-empty { text-align:center; padding:40px; color:var(--foam); font-style:italic; font-size:1.1rem; }
+
+  @media(max-width:600px) {
+    .letter-parchment{padding:30px 20px}
+    .lightbox-prev{left:-10px} .lightbox-next{right:-10px}
+    .moon{width:60px;height:60px;top:30px;right:20px}
+    .countdown-box{padding:16px 18px;min-width:80px}
+    .countdown-num{font-size:2.2rem}
+    .gallery-grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+  }
+</style>
+</head>
+<body>
+
+<div id="loadingScreen">
+  <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+    <path d="M30 5 L30 55 M15 45 C15 55 45 55 45 45" stroke="#7ab8d4" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="30" cy="5" r="4" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+  </svg>
+  <p class="loading-text">Memuat kenangan...</p>
+</div>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="stars-layer" id="starsLayer"></div>
+<div class="moon"></div>
+
+<section class="hero">
+  <div class="hero-content">
+    <p class="hero-subtitle">untuk lacyid yang nakal</p>
+    <h1 class="hero-title">
+      happy birthday lacyiddd
+      <em>botak</em>
+    </h1>
+    <div class="divider-rope"></div>
+  </div>
+  <div class="ship-container">
+    <svg width="320" height="180" viewBox="0 0 320 180" fill="none">
+      <path d="M30 120 Q60 140 160 148 Q260 140 290 120 L275 105 Q230 115 160 118 Q90 115 45 105 Z" fill="#1a3a5c" stroke="#c9a84c" stroke-width="1.5"/>
+      <path d="M45 105 Q90 100 160 103 Q230 100 275 105 L265 88 Q220 95 160 98 Q100 95 55 88 Z" fill="#0d2044" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="60" y="82" width="200" height="8" rx="2" fill="#1a4a7a" stroke="#7ab8d4" stroke-width="0.5"/>
+      <rect x="120" y="58" width="80" height="28" rx="2" fill="#0d2044" stroke="#c9a84c" stroke-width="1"/>
+      <rect x="130" y="64" width="20" height="14" rx="1" fill="#7ab8d4" opacity="0.4"/>
+      <rect x="158" y="64" width="20" height="14" rx="1" fill="#7ab8d4" opacity="0.4"/>
+      <rect x="186" y="64" width="8" height="14" rx="1" fill="#7ab8d4" opacity="0.2"/>
+      <line x1="160" y1="20" x2="160" y2="82" stroke="#8b6914" stroke-width="3"/>
+      <line x1="100" y1="30" x2="100" y2="82" stroke="#8b6914" stroke-width="2.5"/>
+      <path d="M162 22 Q185 40 185 72 L162 72 Z" fill="rgba(245,237,214,0.85)" stroke="#c9a84c" stroke-width="0.8"/>
+      <path d="M158 22 Q135 40 135 72 L158 72 Z" fill="rgba(232,217,181,0.7)" stroke="#c9a84c" stroke-width="0.8"/>
+      <path d="M102 32 Q120 46 120 72 L102 72 Z" fill="rgba(245,237,214,0.75)" stroke="#c9a84c" stroke-width="0.8"/>
+      <path d="M160 20 L178 28 L160 36 Z" fill="#c9a84c"/>
+      <line x1="100" y1="32" x2="160" y2="22" stroke="#8b6914" stroke-width="1" opacity="0.6"/>
+      <line x1="120" y1="72" x2="160" y2="22" stroke="#8b6914" stroke-width="0.8" opacity="0.4"/>
+      <ellipse cx="160" cy="150" rx="140" ry="8" fill="rgba(42,111,168,0.3)"/>
+    </svg>
+  </div>
+  <div class="ocean-container">
+    <svg class="wave-svg" viewBox="0 0 1440 200" style="--speed:8s" preserveAspectRatio="none">
+      <path fill="#0d2044" d="M0,80 C180,140 360,20 540,80 C720,140 900,20 1080,80 C1260,140 1440,60 1440,60 L1440,200 L0,200 Z"/>
+    </svg>
+    <svg class="wave-svg" viewBox="0 0 1440 200" style="--speed:11s" preserveAspectRatio="none">
+      <path fill="#0a1628" d="M0,100 C200,60 400,140 600,100 C800,60 1000,140 1200,100 C1300,80 1440,110 1440,110 L1440,200 L0,200 Z"/>
+    </svg>
+    <svg class="wave-svg" viewBox="0 0 1440 200" style="--speed:14s" preserveAspectRatio="none">
+      <path fill="#050d1a" d="M0,120 C240,80 480,160 720,120 C960,80 1200,160 1440,120 L1440,200 L0,200 Z"/>
+    </svg>
+  </div>
+  <div class="scroll-cue">
+    <span>Scroll</span>
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+      <path d="M12 5 L12 19 M6 13 L12 19 L18 13" stroke="#7ab8d4" stroke-width="1.5" stroke-linecap="round"/>
+    </svg>
+  </div>
+</section>
+
+<section style="background:linear-gradient(180deg,#050d1a 0%,var(--navy) 100%);position:relative;z-index:5;">
+  <div class="section-inner">
+    <p class="section-label">buat lacyid</p>
+    <h2 class="section-title">muhammad rasyid lubis</h2>
+    <div class="letter-parchment">
+      <div class="stamp">io<br>lacyid<br>berteman</div>
+      <p class="letter-body" id="letterText">
+        happy birthday ya lacyid,<br><br>
+        semoga lacyid makin pinter makin ganteng dan tidak nakal lagi<br><br>
+        yang rajin yaa kuliahnyaaaa yang pinter harus pinter biar banggain mama, ayah, kaka nya yang paling penting harus nuruttt sama mama nyaa<br><br>
+        makasiii banyak yaa lasyidd udah baik banget ke aku walapun kita udahan kita harus tetep temenan yaaaa mungin emg kita gabisa jadi pasangan tapi kita harus bisa jadi teman yaaa lacyiddd<br><br>
+        aku sayangggg banget banget sama rasyid selamanyaa.
+      </p>
+      <p class="letter-sig">-- loveeee u more more moreeee--</p>
+    </div>
+  </div>
+</section>
+
+<section class="memories-section">
+  <div class="section-inner">
+    <p class="section-label">-- io and lacyid --</p>
+    <h2 class="section-title">kita</h2>
+    <p style="text-align:center;font-style:italic;color:var(--foam);margin-bottom:30px;">gemasssssssssss</p>
+    <div class="upload-zone" id="uploadZone">
+      <input type="file" id="fileInput" multiple accept="image/*,video/*">
+      <svg class="upload-icon" viewBox="0 0 60 60" fill="none">
+        <circle cx="30" cy="30" r="28" stroke="#7ab8d4" stroke-width="1.5" stroke-dasharray="4 3"/>
+        <path d="M30 40 L30 22 M23 29 L30 22 L37 29" stroke="#c9a84c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M20 44 L40 44" stroke="#7ab8d4" stroke-width="1.5" stroke-linecap="round"/>
+      </svg>
+      <p class="upload-text-main">Tambahin foto atau video yang paling lacyid suka juga yaaa</p>
+      <div class="upload-btn" onclick="document.getElementById('fileInput').click()">Pilih dari Galeri</div>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+    <div class="gallery-empty" id="galleryEmpty" style="display:none;">
+      foto foto kitaaa yang palingggg aku sukaaaaaaaaaaaaaaaaaaaaa
+    </div>
+  </div>
+</section>
+
+<section class="countdown-section">
+  <div class="section-inner">
+    <svg class="compass" viewBox="0 0 120 120" fill="none">
+      <circle cx="60" cy="60" r="56" stroke="#c9a84c" stroke-width="1.5"/>
+      <circle cx="60" cy="60" r="48" stroke="rgba(201,168,76,0.3)" stroke-width="0.8"/>
+      <text x="60" y="16" text-anchor="middle" fill="#c9a84c" font-size="10" font-family="IM Fell English">N</text>
+      <text x="60" y="112" text-anchor="middle" fill="#7ab8d4" font-size="10" font-family="IM Fell English">S</text>
+      <text x="108" y="64" text-anchor="middle" fill="#7ab8d4" font-size="10" font-family="IM Fell English">E</text>
+      <text x="14" y="64" text-anchor="middle" fill="#7ab8d4" font-size="10" font-family="IM Fell English">W</text>
+      <path d="M60 20 L65 58 L60 64 L55 58 Z" fill="#f0d080"/>
+      <path d="M60 100 L65 62 L60 56 L55 62 Z" fill="#7ab8d4" opacity="0.6"/>
+      <circle cx="60" cy="60" r="4" fill="#c9a84c"/>
+    </svg>
+    <p class="section-label">-- Navigasi Waktu --</p>
+    <h2 class="section-title">Hitung Mundur Ulang Tahun Selanjutnya</h2>
+    <div class="countdown-grid">
+      <div class="countdown-box"><span class="countdown-num" id="cdDays">000</span><span class="countdown-label">Hari</span></div>
+      <div class="countdown-box"><span class="countdown-num" id="cdHours">00</span><span class="countdown-label">Jam</span></div>
+      <div class="countdown-box"><span class="countdown-num" id="cdMins">00</span><span class="countdown-label">Menit</span></div>
+      <div class="countdown-box"><span class="countdown-num" id="cdSecs">00</span><span class="countdown-label">Detik</span></div>
+    </div>
+    <div style="margin-top:24px;text-align:center;">
+      <p style="font-family:'IM Fell English',serif;font-style:italic;color:var(--foam);font-size:0.85rem;letter-spacing:0.3em;text-transform:uppercase;margin-bottom:6px;">Ulang Tahun Selanjutnya</p>
+      <p style="font-family:'Playfair Display',serif;font-style:italic;color:var(--gold-light);font-size:1.4rem;letter-spacing:0.05em;" id="nextBdDisplay"></p>
+      <input type="date" id="birthdayInput" style="display:none;"/>
+    </div>
+  </div>
+</section>
+
+
+
+<footer>
+  <svg class="footer-anchor" viewBox="0 0 50 60" fill="none">
+    <path d="M25 5 L25 55 M10 45 C10 55 40 55 40 45" stroke="#7ab8d4" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="25" cy="5" r="4" fill="none" stroke="#c9a84c" stroke-width="1.5"/>
+    <path d="M15 14 Q25 20 35 14" stroke="#c9a84c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    <path d="M8 45 L10 45" stroke="#7ab8d4" stroke-width="2" stroke-linecap="round"/>
+    <path d="M40 45 L42 45" stroke="#7ab8d4" stroke-width="2" stroke-linecap="round"/>
+  </svg>
+  <div class="horizon"></div>
+  <p style="margin-top:30px;">
+    "pokonya lacyid harus jadi orang yang lebih baik lagi jangna seenkanya terus ke orang terus juga sekarang harus bisa apa apa sendiri yaaaaa,<br>
+    Aku bangga banget sama rasyid yang sekarang udah mau belajar walapun kadang masi nakal rasyid harus buktiin ke semua orang kalau rasyid bisa."
+  </p>
+  <p style="margin-top:20px;font-size:0.85rem;color:var(--wave);letter-spacing:0.2em;text-transform:uppercase;">
+    07 September 2024
+  </p>
+</footer>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">x</button>
+    <button class="lightbox-nav lightbox-prev" onclick="navLightbox(-1)">&#8592;</button>
+    <button class="lightbox-nav lightbox-next" onclick="navLightbox(1)">&#8594;</button>
+    <div id="lightboxMedia"></div>
+    <p class="lightbox-caption" id="lightboxCaption"></p>
+  </div>
+</div>
+
+<div class="caption-modal" id="captionModal">
+  <div class="caption-box">
+    <h3>Tambahkan Kenangan</h3>
+    <textarea id="captionInput" placeholder="Ceritakan momen ini... (opsional)" rows="4"></textarea>
+    <div class="caption-box-btns">
+      <button class="btn-skip" onclick="saveCaption(true)">Lewati</button>
+      <button class="btn-save" onclick="saveCaption(false)">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // INDEXEDDB
+  const DB_NAME='lacyid_memories', DB_VERSION=1, STORE_NAME='media';
+  let db=null;
+  function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open(DB_NAME,DB_VERSION);r.onupgradeneeded=e=>{const d=e.target.result;if(!d.objectStoreNames.contains(STORE_NAME)){const s=d.createObjectStore(STORE_NAME,{keyPath:'id',autoIncrement:true});s.createIndex('order','order',{unique:false})}};r.onsuccess=e=>{db=e.target.result;res(db)};r.onerror=e=>rej(e.target.error)})}
+  function dbSave(item){return new Promise((res,rej)=>{const tx=db.transaction(STORE_NAME,'readwrite');const r=tx.objectStore(STORE_NAME).add(item);r.onsuccess=e=>res(e.target.result);r.onerror=e=>rej(e.target.error)})}
+  function dbDelete(id){return new Promise((res,rej)=>{const tx=db.transaction(STORE_NAME,'readwrite');const r=tx.objectStore(STORE_NAME).delete(id);r.onsuccess=()=>res();r.onerror=e=>rej(e.target.error)})}
+  function dbGetAll(){return new Promise((res,rej)=>{const tx=db.transaction(STORE_NAME,'readonly');const r=tx.objectStore(STORE_NAME).getAll();r.onsuccess=e=>res(e.target.result);r.onerror=e=>rej(e.target.error)})}
+
+  let mediaItems=[],pendingFiles=[],pendingIndex=0,lightboxIndex=0;
+
+  async function init(){
+    await openDB();
+    const saved=await dbGetAll();
+    saved.sort((a,b)=>(a.order||0)-(b.order||0));
+    for(const record of saved){
+      const url=URL.createObjectURL(record.blob);
+      mediaItems.push({dbId:record.id,url,caption:record.caption,isVideo:record.isVideo});
+      renderGalleryItem(mediaItems.length-1);
+    }
+    updateEmptyState();
+    const ls=document.getElementById('loadingScreen');
+    ls.classList.add('hidden');
+    setTimeout(()=>ls.remove(),600);
+  }
+
+  // CURSOR
+  const cursor=document.getElementById('cursor'),cursorDot=document.getElementById('cursorDot');
+  document.addEventListener('mousemove',e=>{cursor.style.left=e.clientX+'px';cursor.style.top=e.clientY+'px';cursorDot.style.left=e.clientX+'px';cursorDot.style.top=e.clientY+'px'});
+
+  // STARS
+  const starsLayer=document.getElementById('starsLayer');
+  for(let i=0;i<120;i++){const s=document.createElement('div');s.className='star';const size=Math.random()*2.5+0.5;s.style.cssText=`width:${size}px;height:${size}px;top:${Math.random()*60}%;left:${Math.random()*100}%;--dur:${2+Math.random()*4}s;--delay:${Math.random()*5}s;`;starsLayer.appendChild(s)}
+
+  // UPLOAD
+  const uploadZone=document.getElementById('uploadZone');
+  uploadZone.addEventListener('dragover',e=>{e.preventDefault();uploadZone.classList.add('drag-over')});
+  uploadZone.addEventListener('dragleave',()=>uploadZone.classList.remove('drag-over'));
+  uploadZone.addEventListener('drop',e=>{e.preventDefault();uploadZone.classList.remove('drag-over');handleFiles(Array.from(e.dataTransfer.files))});
+  const fileInput=document.getElementById('fileInput');
+  fileInput.addEventListener('change',()=>handleFiles(Array.from(fileInput.files)));
+
+  function handleFiles(files){const valid=files.filter(f=>f.type.startsWith('image/')||f.type.startsWith('video/'));if(!valid.length)return;pendingFiles=valid;pendingIndex=0;showCaptionModal()}
+  function showCaptionModal(){if(pendingIndex>=pendingFiles.length){pendingFiles=[];return}const f=pendingFiles[pendingIndex];document.getElementById('captionInput').value='';const label=f.name.replace(/\.[^.]+$/,'').replace(/[-_]/g,' ');document.getElementById('captionInput').placeholder=`Ceritakan momen "${label}"... (opsional)`;document.getElementById('captionModal').classList.add('active')}
+
+  async function saveCaption(skip){
+    const f=pendingFiles[pendingIndex];
+    const caption=skip?'':document.getElementById('captionInput').value.trim();
+    const isVideo=f.type.startsWith('video/');
+    const dbId=await dbSave({blob:f,caption,isVideo,order:Date.now()});
+    const url=URL.createObjectURL(f);
+    mediaItems.push({dbId,url,caption,isVideo});
+    document.getElementById('captionModal').classList.remove('active');
+    renderGalleryItem(mediaItems.length-1);
+    updateEmptyState();
+    pendingIndex++;fileInput.value='';
+    setTimeout(showCaptionModal,200);
+  }
+
+  function renderGalleryItem(idx){
+    const item=mediaItems[idx];if(!item)return;
+    const grid=document.getElementById('galleryGrid');
+    const div=document.createElement('div');div.className='gallery-item';div.dataset.idx=idx;
+    if(item.isVideo){const vid=document.createElement('video');vid.src=item.url;vid.muted=true;vid.loop=true;vid.playsInline=true;div.addEventListener('mouseenter',()=>vid.play());div.addEventListener('mouseleave',()=>{vid.pause();vid.currentTime=0});div.appendChild(vid);const badge=document.createElement('div');badge.className='gallery-video-badge';badge.textContent='VIDEO';div.appendChild(badge)}
+    else{const img=document.createElement('img');img.src=item.url;img.alt=item.caption||'Kenangan';div.appendChild(img)}
+    const overlay=document.createElement('div');overlay.className='gallery-overlay';
+    if(item.caption){const cap=document.createElement('p');cap.className='gallery-caption';cap.textContent=item.caption;overlay.appendChild(cap)}
+    div.appendChild(overlay);
+    const delBtn=document.createElement('button');delBtn.className='gallery-delete';delBtn.innerHTML='&times;';delBtn.title='Hapus';delBtn.addEventListener('click',e=>{e.stopPropagation();deleteItem(idx,div)});div.appendChild(delBtn);
+    div.addEventListener('click',()=>openLightbox(idx));grid.appendChild(div);
+  }
+
+  async function deleteItem(idx,el){const item=mediaItems[idx];if(!item)return;if(item.dbId)await dbDelete(item.dbId);URL.revokeObjectURL(item.url);el.style.transition='transform 0.3s,opacity 0.3s';el.style.transform='scale(0)';el.style.opacity='0';setTimeout(()=>{el.remove();mediaItems[idx]=null;updateEmptyState()},300)}
+  function updateEmptyState(){const alive=mediaItems.filter(Boolean);document.getElementById('galleryEmpty').style.display=alive.length===0?'block':'none'}
+
+  function openLightbox(idx){lightboxIndex=idx;renderLightboxMedia();document.getElementById('lightbox').classList.add('active')}
+  function closeLightbox(){document.getElementById('lightbox').classList.remove('active');const v=document.getElementById('lightboxMedia').querySelector('video');if(v)v.pause()}
+  function navLightbox(dir){const alive=mediaItems.map((m,i)=>m?i:-1).filter(i=>i>=0);if(!alive.length)return;const cur=alive.indexOf(lightboxIndex);lightboxIndex=alive[(cur+dir+alive.length)%alive.length];renderLightboxMedia()}
+  function renderLightboxMedia(){const item=mediaItems[lightboxIndex];if(!item)return;const container=document.getElementById('lightboxMedia');const old=container.querySelector('video');if(old)old.pause();container.innerHTML='';if(item.isVideo){const vid=document.createElement('video');vid.src=item.url;vid.controls=true;vid.autoplay=true;vid.style.cssText='max-width:100%;max-height:80vh';container.appendChild(vid)}else{const img=document.createElement('img');img.src=item.url;img.alt=item.caption||'Kenangan';container.appendChild(img)}document.getElementById('lightboxCaption').textContent=item.caption||''}
+
+  document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===this)closeLightbox()});
+  document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('active'))return;if(e.key==='ArrowLeft')navLightbox(-1);if(e.key==='ArrowRight')navLightbox(1);if(e.key==='Escape')closeLightbox()});
+
+  // COUNTDOWN
+  const BD_MONTH=4, BD_DAY=20;
+  function getNextBirthday(){const now=new Date();let next=new Date(now.getFullYear(),BD_MONTH-1,BD_DAY);if(next<=now)next=new Date(now.getFullYear()+1,BD_MONTH-1,BD_DAY);return next}
+
+  // Show next birthday date nicely
+  function formatBirthday(date){const months=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`}
+  document.getElementById('nextBdDisplay').textContent=formatBirthday(getNextBirthday());
+
+  function updateCountdown(){const now=new Date(),target=getNextBirthday(),diff=target-now;if(diff<=0){['cdDays','cdHours','cdMins','cdSecs'].forEach(id=>document.getElementById(id).textContent='00');return}const days=Math.floor(diff/86400000),hours=Math.floor((diff%86400000)/3600000),mins=Math.floor((diff%3600000)/60000),secs=Math.floor((diff%60000)/1000);document.getElementById('cdDays').textContent=String(days).padStart(3,'0');document.getElementById('cdHours').textContent=String(hours).padStart(2,'0');document.getElementById('cdMins').textContent=String(mins).padStart(2,'0');document.getElementById('cdSecs').textContent=String(secs).padStart(2,'0')}
+  setInterval(updateCountdown,1000);updateCountdown();
+  ;
+
+  init();
+</script>
+
+<audio id="bgm" autoplay loop muted>
+  <source src="lagu.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const audio = document.getElementById("bgm");
+
+  window.addEventListener("load", () => {
+    audio.muted = false;
+    audio.volume = 0.3;
+    audio.play().catch(() => {});
+  });
+
+  document.addEventListener("click", () => {
+    audio.play();
+  });
+</script>
+
+</body>
+</html>
